@@ -25,4 +25,12 @@ class Synchronized: NDC {
             counter+= value
         }
     }
+
+    override fun updateAndGet(value: Double): Double {
+        synchronized(lock){
+            counter+= value
+            return counter
+        }
+    }
+
 }

@@ -7,13 +7,7 @@ import main.App.Companion.numberOfIncrements
 import main.App.Companion.numberOfThreads
 import main.App.Companion.startTime
 import main.App.Companion.sum
-import main.counters.Adder
-import main.counters.Atomic
-import main.counters.CounterTypes
-import main.counters.Synchronized
-import java.io.File
-import java.io.InputStream
-import java.nio.file.Paths
+import main.counters.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -22,7 +16,7 @@ import java.util.stream.IntStream
 
 class App {
     companion object {
-        var COUNTER = CounterTypes.SYNCHRONIZED.toString()
+        var COUNTER = CounterTypes.ATOMIC.toString()
         val addersMap = ConcurrentHashMap<String, NDC>()
 
         const val TARGET_NUMBER = 999999
@@ -38,18 +32,17 @@ class App {
 
 fun main(){
     CounterTypes.values().iterator().forEach {
-        println("Running counter test for $it")
+        println("\n\nRunning counter test for $it")
         counterTest(it.name)
     }
+
+    executorService.shutdownNow()
 }
 
 fun counterTest(counter: String) {
-    // Read nodes from file
-    val currentPath = Paths.get("").toAbsolutePath().toString()
-    val inputStream: InputStream = File("$currentPath/src/main/resources/nodes-list").inputStream()
-    val lineList = mutableListOf<String>()
-    inputStream.bufferedReader().useLines { lines -> lines.forEach { lineList.add(it) } }
 
+    // Build NDC Map from nodes list
+    val lineList = readFile()
 
     lineList.forEach {
         addersMap[it] = getCounter(counter)
@@ -60,8 +53,9 @@ fun counterTest(counter: String) {
             IntStream
                 .range(0, numberOfIncrements)
                 .forEach { _ ->
-                    Writer(it.value).run(1.0)
-                    Reader(it.value).run()
+//                    Writer(it.value).run(1.0)
+//                    Reader(it.value).run()
+                    ReaderWriter(it.value).run(1.0)
                 }
         }
     }
@@ -93,12 +87,11 @@ fun computeTime(endTime: Long) {
 }
 
 fun getCounter(counter: String): NDC {
-    val counterTypeEnum = CounterTypes.valueOf(counter)
 
-    return when (counterTypeEnum) {
+    return when (CounterTypes.valueOf(counter)) {
         CounterTypes.ADDER -> Adder()
         CounterTypes.ATOMIC -> Atomic()
-//        CounterTypes.DIRTY -> Dirty()
+        CounterTypes.DIRTY -> Dirty()
         CounterTypes.SYNCHRONIZED -> Synchronized()
     }
 
