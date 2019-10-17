@@ -2,8 +2,7 @@ package main.counters
 
 import main.NDC
 
-class Dirty: NDC {
-
+class Dirty : NDC {
     private var counter: Double = 0.0;
 
     override fun getNdc(): Double {
@@ -15,7 +14,12 @@ class Dirty: NDC {
     }
 
     override fun updateNdc(value: Double) {
-        counter+= value
+        counter += value
+    }
+
+    override fun updateAndGet(value: Double): Double {
+        counter += value
+        return counter
     }
 
 }

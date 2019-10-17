@@ -4,8 +4,7 @@ import com.google.common.util.concurrent.AtomicDouble
 import main.NDC
 
 class Atomic: NDC {
-
-    private val counter = AtomicDouble()
+     private val counter = AtomicDouble()
 
     override fun getNdc(): Double {
         return counter.get()
@@ -19,4 +18,7 @@ class Atomic: NDC {
         counter.addAndGet(value)
     }
 
+    override fun updateAndGet(value: Double): Double {
+        return counter.addAndGet(value)
+    }
 }

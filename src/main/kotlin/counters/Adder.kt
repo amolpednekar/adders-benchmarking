@@ -4,7 +4,6 @@ import main.NDC
 import java.util.concurrent.atomic.DoubleAdder
 
 class Adder() : NDC {
-
     private val counter = DoubleAdder()
 
     override fun getNdc(): Double {
@@ -19,4 +18,10 @@ class Adder() : NDC {
     override fun updateNdc(value: Double) {
         counter.add(value)
     }
+
+    override fun updateAndGet(value: Double): Double {
+        counter.add(value)
+        return counter.sum()
+    }
+
 }
